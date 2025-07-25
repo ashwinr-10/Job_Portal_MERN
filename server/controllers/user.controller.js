@@ -10,18 +10,18 @@ export const register = async (req, res) => {
          
         if (!fullname || !email || !phoneNumber || !password || !role) {
             return res.status(400).json({
-                message: "Please fill all the fields",
+                message: "Something is missing",
                 success: false
             });
         };
         const file = req.file;
         const fileUri = getDataUri(file);
         const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-       
+
         const user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({
-                message: 'User already exists with this email.',
+                message: 'User already exist with this email.',
                 success: false,
             })
         }
@@ -33,6 +33,9 @@ export const register = async (req, res) => {
             phoneNumber,
             password: hashedPassword,
             role,
+            profile:{
+                profilePhoto:cloudResponse.secure_url,
+            }
         });
 
         return res.status(201).json({
@@ -67,7 +70,7 @@ export const login = async (req, res) => {
                 success: false,
             })
         };
-        //to check role is correct or not
+        // check role is correct or not
         if (role !== user.role) {
             return res.status(400).json({
                 message: "Account doesn't exist with current role.",
@@ -113,10 +116,11 @@ export const updateProfile = async (req, res) => {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
         
         const file = req.file;
-       // cloudinar
+        // cloudinary 
         const fileUri = getDataUri(file);
         const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-       
+
+
 
         let skillsArray;
         if(skills){
@@ -138,11 +142,12 @@ export const updateProfile = async (req, res) => {
         if(bio) user.profile.bio = bio
         if(skills) user.profile.skills = skillsArray
       
-        //resume
+        // resume 
         if(cloudResponse){
             user.profile.resume = cloudResponse.secure_url // save the cloudinary url
             user.profile.resumeOriginalName = file.originalname // Save the original file name
         }
+
 
         await user.save();
 

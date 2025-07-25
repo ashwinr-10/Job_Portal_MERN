@@ -12,4 +12,3 @@ router.route("/profile/update").post(isAuthenticated,singleUpload,updateProfile)
 
 export default router;
 
-//attach singleupload middleware in the route where you want to upload a file
