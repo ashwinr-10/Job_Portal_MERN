@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { setSearchedQuery } from '@/redux/jobSlice';
 import { useNavigate } from 'react-router-dom';
 
+
 const HeroSection = () => {
   const [query, setQuery] = useState('');
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ const HeroSection = () => {
     <div
       className='relative h-screen bg-cover bg-center bg-no-repeat'
       style={{
-        backgroundImage: 'url("/src/assets/robert-stump-bwpgwJesFhw-unsplash.jpg")',
+        backgroundImage: 'url("/assets/robert-stump-bwpgwJesFhw-unsplash.jpg")',
       }}
     >
       {/* Dark overlay */}
