@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux'
 import AdminJobsTable from './AdminJobsTable'
 import useGetAllAdminJobs from '@/hooks/useGetAllAdminJobs'
 import { setSearchJobByText } from '@/redux/jobSlice'
+import Footer from '../shared/Footer'
 
 const AdminJobs = () => {
   useGetAllAdminJobs();
@@ -20,7 +21,7 @@ const AdminJobs = () => {
   return (
     <div>
       <Navbar />
-      <div className='max-w-6xl mt-35 mx-auto my-10'>
+      <div className='max-w-6xl pb-5 mb-60 mt-35 mx-auto my-10'>
         <div className='flex items-center justify-between my-5'>
           <Input
             className="w-fit"
@@ -31,6 +32,7 @@ const AdminJobs = () => {
         </div>
         <AdminJobsTable />
       </div>
+      <Footer/>
     </div>
   )
 }

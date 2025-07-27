@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import { useDispatch, useSelector } from 'react-redux'
 import { setLoading } from '@/redux/authSlice'
 import { Loader2 } from 'lucide-react'
+import Footer from '../shared/Footer'
 
 const Signup = () => {
 
@@ -232,6 +233,7 @@ const Signup = () => {
                     <span className='text-sm'>Already have an account? <Link to="/login" className='text-blue-600'>Login</Link></span>
                 </form>
             </div>
+            <Footer/>
         </div>
     )
 }

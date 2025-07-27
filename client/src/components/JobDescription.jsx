@@ -8,6 +8,7 @@ import { setSingleJob } from '@/redux/jobSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import Navbar from './shared/Navbar';
+import Footer from './shared/Footer';
 
 const JobDescription = () => {
     const {singleJob} = useSelector(store => store.job);
@@ -68,13 +69,32 @@ const JobDescription = () => {
                     </div>
                 </div>
                 <Button
-                onClick={isApplied || !isProfileComplete ? null : applyJobHandler}
-                    disabled={isApplied || !isProfileComplete}
-                    className={`rounded-lg ${isApplied || !isProfileComplete ? 'bg-gray-600 cursor-not-allowed' : 'bg-[#7209b7] hover:bg-[#5f32ad]'}`}>
-                    {isApplied ? 'Already Applied' : !isProfileComplete ? 'Complete Profile to Apply' : 'Apply Now'}
-                </Button>
+  onClick={() => {
+    if (!user) {
+      toast.error("Please login to apply for the job.");
+      return;
+    }
+    if (!isApplied && isProfileComplete) {
+      applyJobHandler();
+    }
+  }}
+  disabled={isApplied || !user || !isProfileComplete}
+  className={`rounded-lg ${
+    isApplied || !user || !isProfileComplete
+      ? 'bg-gray-600 cursor-not-allowed'
+      : 'bg-[#7209b7] hover:bg-[#5f32ad]'
+  }`}
+>
+  {
+    !user ? 'Login to Apply'
+    : isApplied ? 'Already Applied'
+    : !isProfileComplete ? 'Complete Profile to Apply'
+    : 'Apply Now'
+  }
+</Button>
+
             </div>
-            { !isProfileComplete && (
+            { user && !isProfileComplete && (
                 <div className='text-red-600 font-semibold my-2'>
                   Please complete your profile (photo, resume, skills, etc.) to apply for jobs.
                 </div>
@@ -103,7 +123,7 @@ const JobDescription = () => {
                 <h1 className='font-bold my-1'>Posted Date: <span className='pl-4 font-normal text-gray-800'>{singleJob?.createdAt.split("T")[0]}</span></h1>
             </div>
         </div>
-        
+                    <Footer/>
         </div>
     )
 }
