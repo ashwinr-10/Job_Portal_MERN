@@ -13,7 +13,17 @@ const Jobs = () => {
 
     useEffect(() => {
         if (searchedQuery) {
+            // Salary filter logic
+            let salaryRange = null;
+            if (searchedQuery === "0-10 LPA") salaryRange = [0, 10];
+            else if (searchedQuery === "10-30 LPA") salaryRange = [10, 30];
+            else if (searchedQuery === "30-50 LPA") salaryRange = [30, 50];
+            else if (searchedQuery === "50+ LPA") salaryRange = [50, Infinity];
+
             const filteredJobs = allJobs.filter((job) => {
+                if (salaryRange) {
+                    return job.salary >= salaryRange[0] && job.salary < salaryRange[1];
+                }
                 return job.title.toLowerCase().includes(searchedQuery.toLowerCase()) ||
                     job.description.toLowerCase().includes(searchedQuery.toLowerCase()) ||
                     job.location.toLowerCase().includes(searchedQuery.toLowerCase())
@@ -25,7 +35,7 @@ const Jobs = () => {
     }, [allJobs, searchedQuery]);
 
     return (
-        <div>
+        <div className="pt-24">
             <Navbar />
             <div className='max-w-7xl mx-auto mt-5'>
                 <div className='flex gap-5'>

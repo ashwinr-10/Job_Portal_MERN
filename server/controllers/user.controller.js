@@ -14,10 +14,7 @@ export const register = async (req, res) => {
                 success: false
             });
         };
-        const file = req.file;
-        const fileUri = getDataUri(file);
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-
+        
         const user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({
@@ -25,7 +22,17 @@ export const register = async (req, res) => {
                 success: false,
             })
         }
+        
         const hashedPassword = await bcrypt.hash(password, 10);
+        
+        let profilePhoto = null;
+        const file = req.file;
+        
+        if (file) {
+            const fileUri = getDataUri(file);
+            const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+            profilePhoto = cloudResponse.secure_url;
+        }
 
         await User.create({
             fullname,
@@ -34,7 +41,7 @@ export const register = async (req, res) => {
             password: hashedPassword,
             role,
             profile:{
-                profilePhoto:cloudResponse.secure_url,
+                profilePhoto: profilePhoto,
             }
         });
 
@@ -44,6 +51,10 @@ export const register = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false
+        });
     }
 }
 export const login = async (req, res) => {
@@ -99,6 +110,10 @@ export const login = async (req, res) => {
         })
     } catch (error) {
         console.log(error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false
+        });
     }
 }
 export const logout = async (req, res) => {
@@ -109,6 +124,10 @@ export const logout = async (req, res) => {
         })
     } catch (error) {
         console.log(error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false
+        });
     }
 }
 export const updateProfile = async (req, res) => {
@@ -116,11 +135,13 @@ export const updateProfile = async (req, res) => {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
         
         const file = req.file;
-        // cloudinary 
-        const fileUri = getDataUri(file);
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-
-
+        let cloudResponse = null;
+        
+        if (file) {
+            // cloudinary 
+            const fileUri = getDataUri(file);
+            cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+        }
 
         let skillsArray;
         if(skills){
@@ -148,7 +169,6 @@ export const updateProfile = async (req, res) => {
             user.profile.resumeOriginalName = file.originalname // Save the original file name
         }
 
-
         await user.save();
 
         user = {
@@ -167,5 +187,9 @@ export const updateProfile = async (req, res) => {
         })
     } catch (error) {
         console.log(error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false
+        });
     }
 }

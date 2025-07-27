@@ -18,16 +18,54 @@ const Login = () => {
         password: "",
         role: "",
     });
+    const [errors, setErrors] = useState({});
     const { loading,user } = useSelector(store => store.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
+        // Clear error when user starts typing
+        if (errors[e.target.name]) {
+            setErrors({ ...errors, [e.target.name]: "" });
+        }
     }
+
+    const validateForm = () => {
+        const newErrors = {};
+        
+        // Email validation
+        if (!input.email.trim()) {
+            newErrors.email = "Email is required";
+        } else if (!/\S+@\S+\.\S+/.test(input.email)) {
+            newErrors.email = "Please enter a valid email address";
+        }
+        
+        // Password validation
+        if (!input.password.trim()) {
+            newErrors.password = "Password is required";
+        } else if (input.password.length < 6) {
+            newErrors.password = "Password must be at least 6 characters";
+        }
+        
+        // Role validation
+        if (!input.role) {
+            newErrors.role = "Please select a role";
+        }
+        
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     const submitHandler = async (e) => {
         e.preventDefault();
+        
+        // Validate form before submission
+        if (!validateForm()) {
+            toast.error("Please fix the errors in the form");
+            return;
+        }
+        
         try {
             dispatch(setLoading(true));
             const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
@@ -43,20 +81,26 @@ const Login = () => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message);
+            if (error.response && error.response.data && error.response.data.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error("Login failed. Please try again.");
+            }
         } finally {
             dispatch(setLoading(false));
         }
     }
+    
     useEffect(()=>{
         if(user){
             navigate("/");
         }
     },[])
+    
     return (
         <div>
             <Navbar />
-            <div className='flex items-center justify-center max-w-7xl mx-auto'>
+            <div className='pt-24 flex items-center justify-center max-w-7xl mx-auto'>
                 <form onSubmit={submitHandler} className='w-1/2 border border-gray-200 rounded-md p-4 my-10'>
                     <h1 className='font-bold text-xl mb-5'>Login</h1>
                     <div className='my-2'>
@@ -66,8 +110,10 @@ const Login = () => {
                             value={input.email}
                             name="email"
                             onChange={changeEventHandler}
-                            placeholder="patel@gmail.com"
+                            placeholder="Enter your email"
+                            className={errors.email ? "border-red-500" : ""}
                         />
+                        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                     </div>
 
                     <div className='my-2'>
@@ -77,8 +123,10 @@ const Login = () => {
                             value={input.password}
                             name="password"
                             onChange={changeEventHandler}
-                            placeholder="patel@gmail.com"
+                            placeholder="Enter your password"
+                            className={errors.password ? "border-red-500" : ""}
                         />
+                        {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
                     </div>
                     <div className='flex items-center justify-between'>
                         <RadioGroup className="flex items-center gap-4 my-5">
@@ -106,8 +154,9 @@ const Login = () => {
                             </div>
                         </RadioGroup>
                     </div>
+                    {errors.role && <p className="text-red-500 text-sm mt-1">{errors.role}</p>}
                     {
-                        loading ? <Button className="w-full my-4"> <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait </Button> : <Button type="submit" className="w-full my-4">Login</Button>
+                        loading ? <Button disabled className="w-full my-4"> <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait </Button> : <Button type="submit" className="w-full my-4">Login</Button>
                     }
                     <span className='text-sm'>Don't have an account? <Link to="/signup" className='text-blue-600'>Signup</Link></span>
                 </form>

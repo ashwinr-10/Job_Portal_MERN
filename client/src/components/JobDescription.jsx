@@ -7,6 +7,7 @@ import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from '@/utils/constant';
 import { setSingleJob } from '@/redux/jobSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
+import Navbar from './shared/Navbar';
 
 const JobDescription = () => {
     const {singleJob} = useSelector(store => store.job);
@@ -50,8 +51,13 @@ const JobDescription = () => {
         fetchSingleJob(); 
     },[jobId,dispatch, user?._id]);
 
+    // Profile completeness check
+    const isProfileComplete = user && user.fullname && user.email && user.phoneNumber && user.profile && user.profile.profilePhoto && user.profile.resume && Array.isArray(user.profile.skills) && user.profile.skills.length > 0;
+
     return (
-        <div className='max-w-7xl mx-auto my-10'>
+        <div>
+            <Navbar />
+        <div className='mt-40 max-w-7xl mx-auto my-10'>
             <div className='flex items-center justify-between'>
                 <div>
                     <h1 className='font-bold text-xl'>{singleJob?.title}</h1>
@@ -62,22 +68,42 @@ const JobDescription = () => {
                     </div>
                 </div>
                 <Button
-                onClick={isApplied ? null : applyJobHandler}
-                    disabled={isApplied}
-                    className={`rounded-lg ${isApplied ? 'bg-gray-600 cursor-not-allowed' : 'bg-[#7209b7] hover:bg-[#5f32ad]'}`}>
-                    {isApplied ? 'Already Applied' : 'Apply Now'}
+                onClick={isApplied || !isProfileComplete ? null : applyJobHandler}
+                    disabled={isApplied || !isProfileComplete}
+                    className={`rounded-lg ${isApplied || !isProfileComplete ? 'bg-gray-600 cursor-not-allowed' : 'bg-[#7209b7] hover:bg-[#5f32ad]'}`}>
+                    {isApplied ? 'Already Applied' : !isProfileComplete ? 'Complete Profile to Apply' : 'Apply Now'}
                 </Button>
             </div>
+            { !isProfileComplete && (
+                <div className='text-red-600 font-semibold my-2'>
+                  Please complete your profile (photo, resume, skills, etc.) to apply for jobs.
+                </div>
+            ) }
             <h1 className='border-b-2 border-b-gray-300 font-medium py-4'>Job Description</h1>
             <div className='my-4'>
                 <h1 className='font-bold my-1'>Role: <span className='pl-4 font-normal text-gray-800'>{singleJob?.title}</span></h1>
                 <h1 className='font-bold my-1'>Location: <span className='pl-4 font-normal text-gray-800'>{singleJob?.location}</span></h1>
                 <h1 className='font-bold my-1'>Description: <span className='pl-4 font-normal text-gray-800'>{singleJob?.description}</span></h1>
-                <h1 className='font-bold my-1'>Experience: <span className='pl-4 font-normal text-gray-800'>{singleJob?.experience} yrs</span></h1>
+                <h1 className='font-bold my-1'>Requirements:
+                  <span className='pl-4 font-normal text-gray-800'>
+                    {Array.isArray(singleJob?.requirements) && singleJob.requirements.length > 0 ? (
+                      <ul className='list-disc ml-6'>
+                        {singleJob.requirements.map((req, idx) => (
+                          <li key={idx}>{req}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span>No requirements specified.</span>
+                    )}
+                  </span>
+                </h1>
+                <h1 className='font-bold my-1'>Experience: <span className='pl-4 font-normal text-gray-800'>{singleJob?.experienceLevel} yrs</span></h1>
                 <h1 className='font-bold my-1'>Salary: <span className='pl-4 font-normal text-gray-800'>{singleJob?.salary}LPA</span></h1>
                 <h1 className='font-bold my-1'>Total Applicants: <span className='pl-4 font-normal text-gray-800'>{singleJob?.applications?.length}</span></h1>
                 <h1 className='font-bold my-1'>Posted Date: <span className='pl-4 font-normal text-gray-800'>{singleJob?.createdAt.split("T")[0]}</span></h1>
             </div>
+        </div>
+        
         </div>
     )
 }
