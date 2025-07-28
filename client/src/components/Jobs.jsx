@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from './shared/Navbar'
-import FilterCard from './FilterCard'
+import React, { useEffect, useState } from 'react';
+import Navbar from './shared/Navbar';
+import FilterCard from './FilterCard';
 import Job from './Job';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import Footer from './shared/Footer';
-
-// const jobsArray = [1, 2, 3, 4, 5, 6, 7, 8];
 
 const Jobs = () => {
     const { allJobs, searchedQuery } = useSelector(store => store.job);
@@ -14,7 +12,6 @@ const Jobs = () => {
 
     useEffect(() => {
         if (searchedQuery) {
-            // Salary filter logic
             let salaryRange = null;
             if (searchedQuery === "0-10 LPA") salaryRange = [0, 10];
             else if (searchedQuery === "10-30 LPA") salaryRange = [10, 30];
@@ -27,26 +24,31 @@ const Jobs = () => {
                 }
                 return job.title.toLowerCase().includes(searchedQuery.toLowerCase()) ||
                     job.description.toLowerCase().includes(searchedQuery.toLowerCase()) ||
-                    job.location.toLowerCase().includes(searchedQuery.toLowerCase())
-            })
-            setFilterJobs(filteredJobs)
+                    job.location.toLowerCase().includes(searchedQuery.toLowerCase());
+            });
+            setFilterJobs(filteredJobs);
         } else {
-            setFilterJobs(allJobs)
+            setFilterJobs(allJobs);
         }
     }, [allJobs, searchedQuery]);
 
     return (
         <div className="pt-24">
             <Navbar />
-            <div className='max-w-7xl mx-auto mt-5'>
-                <div className='flex gap-5'>
-                    <div className='w-20%'>
+            <div className='max-w-7xl mx-auto mt-5 px-4 sm:px-6 lg:px-8'>
+                <div className='flex flex-col lg:flex-row gap-5'>
+                    {/* Filter Sidebar */}
+                    <div className='lg:w-1/4 w-full'>
                         <FilterCard />
                     </div>
+
+                    {/* Job Listings */}
                     {
-                        filterJobs.length <= 0 ? <span>Job not found</span> : (
+                        filterJobs.length <= 0 ? (
+                            <span className="text-center text-gray-500">Job not found</span>
+                        ) : (
                             <div className='flex-1 pb-5'>
-                                <div className='grid grid-cols-3 gap-4'>
+                                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
                                     {
                                         filterJobs.map((job) => (
                                             <motion.div
@@ -66,9 +68,9 @@ const Jobs = () => {
                 </div>
             </div>
 
-            <Footer/>
+            <Footer />
         </div>
-    )
-}
+    );
+};
 
-export default Jobs
+export default Jobs;

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Button } from '../ui/button';
 import { Avatar, AvatarImage } from '../ui/avatar';
-import { LogOut, User2 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { LogOut, Menu, User2, X } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { USER_API_END_POINT } from '@/utils/constant';
@@ -15,10 +15,11 @@ const Navbar = () => {
   const { user } = useSelector(store => store.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Detect scroll
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -38,27 +39,36 @@ const Navbar = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Logout failed");
     }
   };
 
   return (
-    <div className={`fixed top-0 left-0 w-full px-4 transition-all duration-300 z-50 
+    <div className={`fixed top-0 left-0 w-full transition-all duration-300 z-50 
       ${location.pathname === '/' 
-  ? (isScrolled ? 'bg-white text-gray-800 shadow-md' : 'bg-transparent text-white') 
-  : 'bg-white text-gray-800 shadow-md'}
-  py-5 md:py-6`}>
+        ? (isScrolled ? 'bg-white text-gray-800 shadow-md' : 'bg-transparent text-white') 
+        : 'bg-white text-gray-800 shadow-md'}
+      px-4 py-5 md:py-6`}>
+      
       <div className='flex items-center justify-between mx-auto max-w-7xl'>
+
         {/* Logo */}
-        <div className='flex items-center'>
+        <div className='flex items-center justify-between w-full lg:w-auto'>
           <Link to="/" className='flex items-center gap-2 text-2xl font-bold'>
             <img src={logo} alt="Logo" className="h-8 w-8 object-contain" />
             <span>Pro<span className='text-[#F83002]'>Connect.io</span></span>
           </Link>
+
+          {/* Hamburger Toggle */}
+          <div className='lg:hidden'>
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              {isMobileMenuOpen ? <X className='w-5 h-5' /> : <Menu className='w-5 h-5' />}
+            </Button>
+          </div>
         </div>
 
-        {/* Nav Links & User Actions */}
-        <div className='flex items-center gap-8'>
+        {/* Nav Links - Desktop */}
+        <div className='hidden lg:flex items-center gap-8'>
           <ul className='flex font-medium items-center gap-5'>
             {user && user.role === 'recruiter' ? (
               <>
@@ -76,7 +86,7 @@ const Navbar = () => {
 
           {!user ? (
             <div className='flex items-center gap-2'>
-              <Link to="/login"><Button className="bg-[#6A38C2] hover:bg-[#5b30a6]" >Login</Button></Link>
+              <Link to="/login"><Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Login</Button></Link>
               <Link to="/signup"><Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Signup</Button></Link>
             </div>
           ) : (
@@ -115,6 +125,40 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      {/* Nav Links - Mobile Dropdown */}
+      {isMobileMenuOpen && (
+        <div className='lg:hidden mt-3 px-2 bg-white rounded shadow text-gray-800'>
+          <ul className='flex flex-col font-medium gap-4 py-4'>
+            {user && user.role === 'recruiter' ? (
+              <>
+                <li><Link to="/admin/companies">Companies</Link></li>
+                <li><Link to="/admin/jobs">Jobs</Link></li>
+              </>
+            ) : (
+              <>
+                <li><Link to="/">Home</Link></li>
+                <li><Link to="/jobs">Jobs</Link></li>
+                <li><Link to="/browse">Browse</Link></li>
+              </>
+            )}
+          </ul>
+
+          {!user ? (
+            <div className='flex flex-col gap-2 pb-4'>
+              <Link to="/login"><Button className="w-full bg-[#6A38C2] hover:bg-[#5b30a6]">Login</Button></Link>
+              <Link to="/signup"><Button className="w-full bg-[#6A38C2] hover:bg-[#5b30a6]">Signup</Button></Link>
+            </div>
+          ) : (
+            <div className='flex flex-col gap-3 px-2 pb-4 text-sm'>
+              {user?.role === 'student' && (
+                <Link to="/profile" className='flex items-center gap-2'><User2 size={18} /> View Profile</Link>
+              )}
+              <button onClick={logoutHandler} className='flex items-center gap-2 text-left'><LogOut size={18} /> Logout</button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

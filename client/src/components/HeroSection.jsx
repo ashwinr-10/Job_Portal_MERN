@@ -39,19 +39,19 @@ const HeroSection = () => {
           Explore roles, submit applications effortlessly, and take the next step toward your future.
         </p>
 
-        {/*Search Bar */}
-        <div className='flex w-[25%] bg-white shadow-lg border border-gray-200 pl-3 rounded-full items-center gap-4 mx-auto'>
-                    <input
-                        type="text"
-                        placeholder='Land the Job You’ve Been Waiting For'
-                        onChange={(e) => setQuery(e.target.value)}
-                        className='outline-none border-none w-full'
+        {/* Responsive Search Bar */}
+<div className='flex w-full max-w-md sm:max-w-lg md:max-w-xl lg:w-[25%] bg-white shadow-lg border border-gray-200 pl-3 rounded-full items-center gap-2 sm:gap-4 mx-auto'>
+  <input
+    type="text"
+    placeholder='Land the Job You’ve Been Waiting For'
+    onChange={(e) => setQuery(e.target.value)}
+    className='outline-none border-none w-full text-sm sm:text-base py-2'
+  />
+  <Button onClick={searchJobHandler} className="rounded-r-full bg-[#6A38C2] px-3">
+    <Search className='h-4 w-4 sm:h-5 sm:w-5' />
+  </Button>
+</div>
 
-                    />
-                    <Button onClick={searchJobHandler} className="rounded-r-full bg-[#6A38C2]">
-                        <Search className='h-5 w-5' />
-                    </Button>
-                </div>
       </div>
     </div>
   );
