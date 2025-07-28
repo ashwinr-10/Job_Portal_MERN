@@ -27,8 +27,8 @@ const Applicants = () => {
     return (
         <div>
             <Navbar />
-            <div className='max-w-7xl mt-35 mx-auto'>
-                <h1 className='font-bold text-xl my-5'>Applicant {applicants?.applications?.length}</h1>
+            <div className='max-w-7xl mt-35 mb-50 mx-auto'>
+                <h1 className='font-bold text-xl my-5'>No. of Applicants {applicants?.applications?.length}</h1>
                 <ApplicantsTable />
             </div>
             <Footer/>
